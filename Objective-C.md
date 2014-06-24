@@ -44,6 +44,8 @@ Every code file in an Objective-C project, as most others, should be unique and 
 
 Every implementation file should have its own header, as each header file should have its own forward-declarations and imports. The use of Objective-C one-line forward declarations, signified by ```@class``` above the ```@interface``` of a header file, paired with ```#import``` in the implementation, [is by far the most ideal](http://nshipster.com/at-compiler-directives/). All referenced classes should be individually and explicitly dealt with on a per-file basis, to ensure long-time operability and easy workspace sharing. Even if this means including ```#import <UIKit/UIKit.h>``` in the beginning of every ```UIView``` subclass created.
 
+Including extensive forward-declarations in ```.h``` files also visually connects the implementations with their required classes, preventing unintentional harm by altering those classes without realizing the usage.
+
 All import statements should appear at the start of the file, with no preceding lines or whitespace (excluding the [file description](#descriptions)). It is recommended to group imports by framework or directory, for example:
 
 	#import <UIKit/UIKit.h>
@@ -51,11 +53,11 @@ All import statements should appear at the start of the file, with no preceding 
 	
 	#import "Reachability/Reachability.h"
 	
-	#import "JWLogger.h"
+	#import "JWState.h"
 	
 	@class JWWorld, JWContinent, JWCountry;
 	
-	@interface JWState : ...
+	@interface JWCity : JWState
 	
 ## Macros
 
