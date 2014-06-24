@@ -174,13 +174,16 @@ Properties and their names should be treated with the same care and descriptiven
 	/** . . .
 	@property(nonatomic, retain) NSArray *quickReplyToolbarTitles;
 
-When accessing properties in the implementation, always chose to use self-referential dot notation over underscores or synthesizing.
+When accessing properties in the implementation, always choose to use underscore notation over dot notation or synthesizing. If you wish to refer specifically to the property's getter or setter, use ```[self active]``` over ```self.active``` (which are [neccessarily equivalent](http://stackoverflow.com/questions/10333495/difference-beetween-and-self-in-objective-c)).
 
-	self.active = NO;
-	self.quickReplyToolbarTitles = @[@"Reply", @"Ignore", @"Read"];
+	_active = NO;
+	_quickReplyToolbarTitles = @[@"Reply", @"Ignore", @"Read"];
 	
-This puts emphasis on the origin of the variables, as well as forces the properties to be transparent in their usage through their names. Never use bracket notation for accessing properties, even when they have overriden getters or setters.
-
+This makes the origin of the variables transparent, and forces local method usage to conform to the same styles as external method usage:
+	
+	[self myOwnGetter] ≡ [friend hisOwnGetter] 
+	_myOwnProperty ≡ friend.hisOwnProperty
+	
 ## Methods
 
 ### Method Naming
