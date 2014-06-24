@@ -14,7 +14,6 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
 	* [Static Variables](#static-variables)
 	* [Instance Variables](#instance-variables)
 	* [Properties](#properties)
-	* [Variable Syntax](#variable-syntax)
 * [Methods](#methods)
 	* [Method Naming](#method-naming)
 	* [Method Syntax](#method-syntax) 
@@ -125,3 +124,57 @@ which is more suitable (and less sanity-taxing) than:
 	- (NSAttributedString *)refreshControlAttributedStringFromDate:(NSDate *)date {
 		NSDateFormatter *refreshControlDateFormatter = [[NSDateFormatter alloc] init];
 		NSString *refreshControlPrefixedDescription = . . .
+		
+		
+### Static Variables
+
+Static variables representing constant, shared values should use [Hungarian Notation](http://stackoverflow.com/questions/500030/what-is-the-significance-of-starting-constants-with-k) in the header file (directly preceeding ```@interface```):
+
+	static NSString * kContentReadyToBeStreamedNotifictionName = @"Content.Stream.Ready"
+
+where inline static variables can remain unaltered from standard variable camelCase:
+
+	+ (JWPreferencesManager *)sharedManager {
+		static dispatch_once_t dispatchToken;
+		static JWPreferencesManager *sharedManager = nil;
+ 		
+ 		dispatch_once(&dispatchToken, ^{
+ 			sharedManager = [[self alloc] init];
+ 		});
+ 		
+		return sharedManager;
+	}
+
+([Singletons: You're doing them wrong](http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html) conformed to style guides)
+
+### Instance Variables
+
+Instance variables which are not properties should still be represented in the header file, and should stylize themselves descriptively and without use of excessive verbage. 
+
+	@interface StormOfSwords : ASongOfIceAndFire {
+		@private
+		NSString *cachedReekIdentity;
+		NSInteger deathsThatShouldHaveBeenPrevented;
+		@public
+		CGFloat daysUntilWinterIsHere;
+		@protected
+		GRMStark *theKingInTheNorth;
+	}
+	
+
+### Properties
+
+Properties and their names should be treated with the same care and descriptiveness as method names. Avoid including properties that have overlapping content, or are unused outside of the class. Always prefix unique properties with [appropriate comments](#comments).
+
+	/** . . .
+	@property(nonatomic, readwrite) BOOL active;
+	
+	/** . . .
+	@property(nonatomic, retain) NSArray *quickReplyToolbarTitles;
+
+When accessing properties in the implementation, always chose to use self-referential dot notation over underscores or synthesizing.
+
+	self.active = NO;
+	self.quickReplyToolbarTitles = @[@"Reply", @"Ignore", @"Read"];
+	
+This puts emphasis on the origin of the variables, as well as forces the properties to be transparent in their usage through their names. Never use bracket notation for accessing properties, even when they have overriden getters or setters.
