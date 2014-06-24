@@ -128,9 +128,9 @@ which is more suitable (and less sanity-taxing) than:
 		
 ### Static Variables
 
-Static variables representing constant, shared values should use [Hungarian Notation](http://stackoverflow.com/questions/500030/what-is-the-significance-of-starting-constants-with-k) in the header file (directly preceeding ```@interface```):
+Static variables representing constant, shared values should use [Hungarian Notation](http://stackoverflow.com/questions/500030/what-is-the-significance-of-starting-constants-with-k) in the header file (directly proceeding ```@interface```):
 
-	static NSString * kContentReadyToBeStreamedNotifictionName = @"Content.Stream.Ready"
+	static NSString * kContentReadyToBeStreamedNotificationName = @"Content.Stream.Ready"
 
 where inline static variables can remain unaltered from standard variable camelCase:
 
@@ -178,3 +178,32 @@ When accessing properties in the implementation, always chose to use self-refere
 	self.quickReplyToolbarTitles = @[@"Reply", @"Ignore", @"Read"];
 	
 This puts emphasis on the origin of the variables, as well as forces the properties to be transparent in their usage through their names. Never use bracket notation for accessing properties, even when they have overriden getters or setters.
+
+## Methods
+
+### Method Naming
+
+Methods should be named in the traditional Objective-C, verbose manner, using sensical parameter names and nearly-English phrasing.
+
+	- (void)presentAttachmentViewControllerAbove:(UIViewController *)currentViewController
+
+### Method Syntax
+
+Only use bracket notation when accessing methods, and dot notation when accessing properties; prefer ```array.count``` over ```[array count]```, and don't be afraid to let your IDE wrap lines with long method names.
+
+	[self addTranslationSpringWithMass:5.0 stiffness:1.0 damping:0.25 startTime:1.0 velocity:2.0 timing:springTiming];
+
+
+### Init
+
+Always create obvious initializations for classes with many required properties, and always include all overriden -init methods in headers (even ```- (instancetype)init```). The basic form of an Objective-C constructor (accessible in Xcode via snippets) is ideal:
+
+	- (instancetype)initWithFrame:(CGRect)frame {
+		self = [super initWithFrame:frame];
+		
+		if (self) {
+			self.backgroundColor = [UIColor redColor];
+		}
+		
+		return self;
+	}
