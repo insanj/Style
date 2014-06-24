@@ -10,10 +10,10 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
 * [Macros](#macros)
 * [Comments](#comments)
 * [Variables](#variables)
+ 	* [Variable Naming](#variable-naming)
 	* [Static Variables](#static-variables)
 	* [Instance Variables](#instance-variables)
 	* [Properties](#properties)
-	* [Variable Naming](#variable-naming)
 	* [Variable Syntax](#variable-syntax)
 * [Methods](#methods)
 	* [Method Naming](#method-naming)
@@ -32,12 +32,12 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
 Every code file in an Objective-C project, as most others, should be unique and important in-and-of itself. As such, each deserves a brief, succinct description and disclaimer. This block of metadata, which is almost entirely standard in Xcode, should prefix every ```.h``` and ```.m``` file:
 
 	//
-	//  Class.(h or m)
-	//  Project
-	//  Description
-	//
-	//  Created by Author on mm/dd/yy.
-	//  Copyright (c) yyyy Maintainer. All rights reserved.
+	//  UICollectionView.h
+	//  UIKit
+	//	Manages an ordered collection of data items and presents them using customizable layouts.
+	//	
+	//  Created by Apple on 04/08/95.
+	//  Copyright (c) 2011-2013, Apple Inc. All rights reserved.
 	//
 
 
@@ -72,5 +72,56 @@ Macros are very useful, simple tools to use when debugging or quickly changing s
 Avoid using macros for object types and constant key values, as well as even remotely complex functions. Static variables and C-functions are always preferable.
 
 
+## Comments
+
+However verbose we make our Objective-C code, there are always situations where a little more explaining could go a long way. Leaving small, inline comments directly beside a relatively short line of code is the tidiest way to go.
+
+	int radius = ceilf(powf(2 * M_PI * r, 2)); // Rounded up to prevent 1/x pixel display issues
+	
+This style preserves readability, without interrupting the flow of the code too much, and forces the comment to be succint. In the case of long, branching ```if``` / ```else``` statements, consider refactoring the code to split most components into small, more modular functions. Then, about a set of condition:
+
+	// If the user's credentials weren't found
+	if (. . .)
+	
+	// If the user's credentials couldn't be secured
+	else if (. . .)
+	
+	// If the user's credentials were incorrect
+	else
+
+The most valuable and documentative form of comments comes in the form of Apple-doc conforming property and method header blocks. These are incredibly useful, particularly if kept up-to-date with recent code, for both readability and idea mulling-over. Here's a great, extended example:
+
+	/**
+ 	*  Synchronously deploy a warning shot to the given cities.
+ 	*
+ 	*  @param locations Array of arrays; every element is another array, with the first element being the name of the state, and the following elements names of cities in that state.
+ 	*
+ 	*  @return Dictionary with cites : respose. Both conform to NSString.
+ 	*
+ 	*  @see deployWarningShotToWorld A more streamlined way of getting your point across.
+	*  @warning Paste me inline to warn about the dangers of poking bears.
+ 	*/
+	- (NSDictionary *)deployWarningShotToLocations:(NSArray *)locations;
 
 
+More examples can be found in this handy [NSHipster article](http://nshipster.com/documentation/). Make sure to pick up [VVDocumenter-Xcode](https://github.com/onevcat/VVDocumenter-Xcode) for speedy comment block creation.
+
+## Variables
+
+### Variable Naming
+
+Always choose lengthy, descriptive, attractive names for variables. Especially when creating static variables, instance variables, or properties, context needs to be embedded in the name— sacrificing minor typing time (use autocomplete already!) for a huge increase in understandability.
+
+	@property(nonatomic, retain) CGFloat initialBallAngularVelocity;
+	
+This also spares the need for attached comments, and lets anyone understand the basic structure of the code. When creating local variables in a specific method, however, some specificity can be forgone:
+
+	- (NSAttributedString *)refreshControlAttributedStringFromDate:(NSDate *)date {
+		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		NSString *prefixedDescription = . . .
+
+which is more suitable (and less sanity-taxing) than:
+
+	- (NSAttributedString *)refreshControlAttributedStringFromDate:(NSDate *)date {
+		NSDateFormatter *refreshControlDateFormatter = [[NSDateFormatter alloc] init];
+		NSString *refreshControlPrefixedDescription = . . .
