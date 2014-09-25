@@ -14,6 +14,7 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
 	* [Static Variables](#static-variables)
 	* [Instance Variables](#instance-variables)
 	* [Properties](#properties)
+	* [Private Properties](#private-properties)
 * [Methods](#methods)
 	* [Method Naming](#method-naming)
 	* [Method Syntax](#method-syntax) 
@@ -25,6 +26,7 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
 * [Types](#types)
  	* [CGRect](#cgrect)
 	* [Enumerated Types](#enumerated-types)
+	* [Bitmasks](#bitmasks)
 
 ## Descriptions
 
@@ -77,9 +79,9 @@ Avoid using macros for object types and constant key values, as well as even rem
 
 However verbose we make our Objective-C code, there are always situations where a little more explaining could go a long way. Leaving small, inline comments directly beside a relatively short line of code is the tidiest way to go.
 
-	int radius = ceilf(powf(2 * M_PI * r, 2)); // Rounded up to prevent 1/x pixel display issues
+	NSInteger radius = ceilf(powf(2.0 * M_PI * r, 2.0)); // Rounded up to prevent 1/x pixel display issues
 	
-This style preserves readability, without interrupting the flow of the code too much, and forces the comment to be succint. In the case of long, branching ```if``` / ```else``` statements, consider refactoring the code to split most components into small, more modular functions. Then, about a set of condition:
+This style preserves readability, without interrupting the flow of the code too much, and forces the comment to be succint. In the case of long, branching ```if``` / ```else``` statements, consider refactoring the code to split most components into small, more modular functions. Then, about a set of conditions:
 
 	// If the user's credentials weren't found
 	if (. . .)
@@ -163,6 +165,7 @@ Instance variables which are not properties should still be represented in the h
 		GRMStark *theKingInTheNorth;
 	}
 	
+However, avoid using them over [private properties](#private-properties) unless explicitly required.
 
 ### Properties
 
@@ -179,10 +182,22 @@ When accessing properties in the implementation, always choose to use underscore
 	_active = NO;
 	_quickReplyToolbarTitles = @[@"Reply", @"Ignore", @"Read"];
 	
-This makes the origin of the variables transparent, and forces local method usage to conform to the same styles as external method usage:
+This makes the origin of the variables transparent, and forces local method usage to conform to the same styles as external method usage.
 	
 	[self myOwnGetter] ≡ [friend hisOwnGetter] 
 	_myOwnProperty ≡ friend.hisOwnProperty
+	
+### Private Properties
+
+Whenever a property doesn't need to be accessed externally (and may benefit from hidden usage, such as ```UIViews``` in a complex level of abstraction), always utilize private properties over instance variables.
+
+In the ```.m```:
+	
+	@interface JWCompositeView ()
+	
+	@property (strong, nonatomic, readonly) FXBlurView *blurBackingView;
+	
+	@end
 	
 ## Methods
 
@@ -212,3 +227,123 @@ Always create obvious initializations for classes with many required properties,
 		
 		return self;
 	}
+
+## Spacing
+
+Always indent based on context. In general, use tabs over spaces for all aesthetic padding. Block braces should always be preceded by a space, even inline:
+
+	[UIView animateWithDuration:0.4 animations:^(void){
+		[confirmationPulse setTransform:CGAffineTransformMakeScale(25.0, 25.0)];
+			confirmationPulse.alpha = 0.0;
+	} completion:^(BOOL finished) {
+		[confirmationPulse removeFromSuperview];
+	}];
+
+
+Use whitespaces lines gratuitously, at least one before and after each method implementation, and ```#pragma mark```.
+
+Include padding whitespace when using ternary operators: 
+
+	NSString *validString = givenString && givenString.length > 0 ? givenString : @"N/A";
+	
+	
+## Conditionals 
+
+As described in the [NYTimes Style Guide](https://github.com/NYTimes/objective-c-style-guide):
+
+> Conditional bodies should always use braces even when a conditional body could be written without braces (e.g., it is one line only) to prevent [errors](https://github.com/NYTimes/objective-c-style-guide/issues/26#issuecomment-22074256). These errors include adding a second line and expecting it to be part of the if-statement. Another, [even more dangerous defect](http://programmers.stackexchange.com/a/16530) may happen where the line "inside" the if-statement is commented out, and the next line unwittingly becomes part of the if-statement. In addition, this style is more consistent with all other conditionals, and therefore more easily scannable.
+
+**For example:**
+
+	if (!error) {
+    	return success;
+	}
+
+**Not:**
+
+	if (!error)
+    	return success;
+
+or
+
+	if (!error) return success;
+
+### Ternary Operator
+
+As described in the [NYTimes Style Guide](https://github.com/NYTimes/objective-c-style-guide):
+
+> The Ternary operator, ? , should only be used when it increases clarity or code neatness. A single condition is usually all that should be evaluated. Evaluating multiple conditions is usually more understandable as an if statement, or refactored into instance variables.
+
+**For example:**
+
+	result = a > b ? x : y;
+
+**Not:**
+
+	result = a > b ? x = c > d ? c : d : y;
+	
+## Literals
+
+Always follow [Modern Objective-C Guidelines](https://developer.apple.com/library/ios/releasenotes/ObjectiveC/ModernizationObjC/AdoptingModernObjective-C/AdoptingModernObjective-C.html) when utilizing `NSString`, `NSDictionary`, `NSArray`, and `NSNumber` literals.
+
+	NSString *friendWithWindowsPhone = @"Ben";
+	NSArray *friendsWithoutConfirmation = @[@"Noah", @"Chandler", @"Morgan"];
+	NSDictionary *friendsOperatingSystems = @{ @"Jake" : @"Android", @"Will" : @"iOS 7", @"Dean" : @"iOS 8" };
+	NSNumber *friendsWithoutSmartphones = @(2);
+	
+
+## Types
+
+### CGRect
+
+As described in the [NYTimes Style Guide](https://github.com/NYTimes/objective-c-style-guide):
+
+> When accessing the `x`, `y`, `width`, or `height` of a `CGRect`, always use the [`CGGeometry` functions](http://developer.apple.com/library/ios/#documentation/graphicsimaging/reference/CGGeometry/Reference/reference.html) instead of direct struct member access. From Apple's `CGGeometry` reference:
+
+>> All functions described in this reference that take CGRect data structures as inputs implicitly standardize those rectangles before calculating their results. For this reason, your applications should avoid directly reading and writing the data stored in the CGRect data structure. Instead, use the functions described here to manipulate rectangles and to retrieve their characteristics.
+
+**For example:**
+
+	CGRect frame = self.view.frame;
+
+	CGFloat x = CGRectGetMinX(frame);
+	CGFloat y = CGRectGetMinY(frame);
+	CGFloat width = CGRectGetWidth(frame);
+	CGFloat height = CGRectGetHeight(frame);
+	
+
+**Not:**
+
+	CGRect frame = self.view.frame;
+
+	CGFloat x = frame.origin.x;
+	CGFloat y = frame.origin.y;
+	CGFloat width = frame.size.width;
+	CGFloat height = frame.size.height;
+
+### Enumerated Types
+
+As described in the [NYTimes Style Guide](https://github.com/NYTimes/objective-c-style-guide):
+
+
+When using `enum`s, it is recommended to use the new fixed underlying type specification because it has stronger type checking and code completion. The SDK now includes a macro to facilitate and encourage use of fixed underlying types — `NS_ENUM()`
+
+**Example:**
+
+	typedef NS_ENUM(NSInteger, NYTAdRequestState) {
+	    NYTAdRequestStateInactive,
+	    NYTAdRequestStateLoading
+	};
+
+### Bitmasks
+
+As described in the [NYTimes Style Guide](https://github.com/NYTimes/objective-c-style-guide):
+
+When working with bitmasks, use the `NS_OPTIONS` macro.
+
+	typedef NS_OPTIONS(NSUInteger, NYTAdCategory) {
+	  NYTAdCategoryAutos      = 1 << 0,
+	  NYTAdCategoryJobs       = 1 << 1,
+	  NYTAdCategoryRealState  = 1 << 2,
+	  NYTAdCategoryTechnology = 1 << 3
+	};
