@@ -7,4 +7,4 @@ Currently included:
 
 - [Objective-C](Objective-C.md)
 
-See license for rights as well as attributions for projects and references used.
+See [LICENSE](LICENSE.md) for rights as well as attributions for projects and references used.
