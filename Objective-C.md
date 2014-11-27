@@ -27,6 +27,7 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
  	* [CGRect](#cgrect)
 	* [Enumerated Types](#enumerated-types)
 	* [Bitmasks](#bitmasks)
+* [Assets](#assets)
 
 ## Descriptions
 
@@ -347,3 +348,11 @@ When working with bitmasks, use the `NS_OPTIONS` macro.
 	  NYTAdCategoryRealState  = 1 << 2,
 	  NYTAdCategoryTechnology = 1 << 3
 	};
+	
+## Assets
+
+All image assets should be contained in [Asset Catalogs](https://developer.apple.com/library/ios/recipes/xcode_help-image_catalog-1.0/Recipe.html), which allows for easy categorization, organization, and resolution-safe accessing. New catalogs should be created sparingly, however, with a new set only for new categories of image files, or generations of file usage. For example: ```Icons.xcassets```, for all in-app navigation bar, toolbar, et al icons, ```Graphics.xcassets```, for all graphics and display images, including splash screens and custom loading imagery, and ```Legacy Design.xcassets``` for antiquated assets.
+
+When naming files in asset catalogs, it's important to establish consistency and readability. Because there aren't many restrictions in convention, I'd advise the form ```location name extra-information```, which in use with, for example, the main tab bar icon for the "Home" area would look like ```tab home```.
+
+For non-image assets, such as videos and fonts, simply drop them in the same parent folder that the ```.xcassets``` files are contained in. Keeping this distinct and non-confusing with a name such as ```Resources``` is best.
