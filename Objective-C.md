@@ -13,7 +13,7 @@ Subjects are arranged in the order you'd find each in an average Objective-C cod
  	* [Variable Naming](#variable-naming)
 	* [Static Variables](#static-variables)
 	* [Instance Variables](#instance-variables)
-	* [Properties](#properties)
+	* [Public Properties](#public-properties)
 	* [Private Properties](#private-properties)
 * [Methods](#methods)
 	* [Method Naming](#method-naming)
@@ -133,9 +133,9 @@ which is more suitable (and less sanity-taxing) than:
 		
 ### Static Variables
 
-Static variables representing constant, shared values should use [Hungarian Notation](http://stackoverflow.com/questions/500030/what-is-the-significance-of-starting-constants-with-k) in the header file (directly proceeding ```@interface```):
+Static variables representing constant, shared values should use [Hungarian Notation](http://stackoverflow.com/questions/500030/what-is-the-significance-of-starting-constants-with-k) in the header file (directly following ```@interface```):
 
-	static NSString * kContentReadyToBeStreamedNotificationName = @"Content.Stream.Ready"
+	static NSString * kVideoContentReadyToBeStreamedNotificationName = @"Content.Stream.Ready"
 
 where inline static variables can remain unaltered from standard variable camelCase:
 
@@ -154,23 +154,11 @@ where inline static variables can remain unaltered from standard variable camelC
 
 ### Instance Variables
 
-Instance variables which are not properties should still be represented in the header file, and should stylize themselves descriptively and without use of excessive verbage. 
+Instance variables are recommended against in [Modern Objective-C](https://developer.apple.com/library/ios/releasenotes/ObjectiveC/ModernizationObjC/AdoptingModernObjective-C/AdoptingModernObjective-C.html#//apple_ref/doc/uid/TP40014150-CH1-SW4). Avoid using them over [private properties](#private-properties) unless explicitly required. 
 
-	@interface StormOfSwords : ASongOfIceAndFire {
-		@private
-		NSString *cachedReekIdentity;
-		NSInteger deathsThatShouldHaveBeenPrevented;
-		@public
-		CGFloat daysUntilWinterIsHere;
-		@protected
-		GRMStark *theKingInTheNorth;
-	}
-	
-However, avoid using them over [private properties](#private-properties) unless explicitly required.
+### Public Properties
 
-### Properties
-
-Properties and their names should be treated with the same care and descriptiveness as method names. Avoid including properties that have overlapping content, or are unused outside of the class. Always prefix unique properties with [appropriate comments](#comments).
+Properties and their names should be treated with the same care and descriptiveness as method names. Avoid including public properties that have overlapping content, or are unused outside of the class. Always prefix unique properties with [appropriate comments](#comments).
 
 	/** . . .
 	@property(nonatomic, readwrite) BOOL active;
@@ -178,25 +166,21 @@ Properties and their names should be treated with the same care and descriptiven
 	/** . . .
 	@property(nonatomic, retain) NSArray *quickReplyToolbarTitles;
 
-When accessing properties in the implementation, always choose to use underscore notation over dot notation or synthesizing. If you wish to refer specifically to the property's getter or setter, use ```[self active]``` over ```self.active``` (which are [neccessarily equivalent](http://stackoverflow.com/questions/10333495/difference-beetween-and-self-in-objective-c)).
+When accessing properties in the direct implementation, I choose to use underscore notation over dot notation or synthesizing. When accessing properties of a superclass, or if you wish to refer specifically to the property's getter or setter, use ```self.active``` over ```[self active]``` (which are [neccessarily equivalent](http://stackoverflow.com/questions/10333495/difference-beetween-and-self-in-objective-c)).
 
 	_active = NO;
 	_quickReplyToolbarTitles = @[@"Reply", @"Ignore", @"Read"];
-	
-This makes the origin of the variables transparent, and forces local method usage to conform to the same styles as external method usage.
-	
-	[self myOwnGetter] ≡ [friend hisOwnGetter] 
-	_myOwnProperty ≡ friend.hisOwnProperty
+	self.quickReplyToolbar.items = _active ? _quickReplyToolbarTitles : @[];
 	
 ### Private Properties
 
-Whenever a property doesn't need to be accessed externally (and may benefit from hidden usage, such as ```UIViews``` in a complex level of abstraction), always utilize private properties over instance variables.
+Whenever a property does not need to be accessed externally (and may benefit from hidden usage, such as ```UIViews``` in a complex level of abstraction), always utilize private properties.
 
 In the ```.m```:
 	
 	@interface JWCompositeView ()
 	
-	@property (strong, nonatomic, readonly) FXBlurView *blurBackingView;
+	@property (strong, nonatomic) FXBlurView *blurBackingView;
 	
 	@end
 	
@@ -204,13 +188,13 @@ In the ```.m```:
 
 ### Method Naming
 
-Methods should be named in the traditional Objective-C, verbose manner, using sensical parameter names and nearly-English phrasing.
+Methods should be named using natural, verbose Objective-C with sensible parameter names and common English phrasing.
 
-	- (void)presentAttachmentViewControllerAbove:(UIViewController *)currentViewController
+	- (void)transitionToAttachmentViewController:(UIViewController *)attachmentViewController
 
 ### Method Syntax
 
-Only use bracket notation when accessing methods, and dot notation when accessing properties; prefer ```array.count``` over ```[array count]```, and don't be afraid to let your IDE wrap lines with long method names.
+Use bracket notation when accessing methods, and dot notation when accessing properties; prefer ```array.count``` over ```[array count]```, and don't be afraid to let your IDE wrap lines with long method names. You can always option-click a method name to check if you're actually accessing a method or a property.
 
 	[self addTranslationSpringWithMass:5.0 stiffness:1.0 damping:0.25 startTime:1.0 velocity:2.0 timing:springTiming];
 
@@ -231,24 +215,27 @@ Always create obvious initializations for classes with many required properties,
 
 ## Spacing
 
-Always indent based on context. In general, use tabs over spaces for all aesthetic padding. Block braces should always be preceded by a space, even inline:
+Always indent based on context. In general, use tabs over spaces for all aesthetic padding. Block braces can be subjectively spaced.
 
 	[UIView animateWithDuration:0.4 animations:^(void){
-		[confirmationPulse setTransform:CGAffineTransformMakeScale(25.0, 25.0)];
-			confirmationPulse.alpha = 0.0;
-	} completion:^(BOOL finished) {
-		[confirmationPulse removeFromSuperview];
+		confirmationPulse.transform = CGAffineTransformMakeScale(25.0, 25.0);
+	} completion:^(BOOL finished){
+		[self completedAnimationWithUserInfo:@{ kPulseUserInfoAnimationNameKey : @"Enlarge" }];
 	}];
 
+Use whitespace lines gratuitously, at least one before and after each method implementation, and ```#pragma mark```.
 
-Use whitespaces lines gratuitously, at least one before and after each method implementation, and ```#pragma mark```.
-
-Include padding whitespace when using ternary operators: 
-
-	NSString *validString = givenString && givenString.length > 0 ? givenString : @"N/A";
+	#pragma mark - table view
+	#pragma mark data source
 	
+	- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+
+Include padding whitespace when using most ternary operators: 
+
+	NSString *displayName = givenName && givenName.length > 0 ? givenName : @"No Name";
+	NSString *sanitizedName = givenName ?: @"";
 	
-## Conditionals 
+## Conditionals
 
 As described in the [NYTimes Style Guide](https://github.com/NYTimes/objective-c-style-guide):
 
