@@ -1,6 +1,6 @@
 ## License
 
-Style (this repository) is licensed under [Creative Commons Attribution-NonCommercial 3.0 United States License](http://creativecommons.org/licenses/by-nc/3.0/us/) as of 2014:
+Style (this entire repository) is licensed under [Creative Commons Attribution-NonCommercial 3.0 United States License](http://creativecommons.org/licenses/by-nc/3.0/us/) (2014-2015):
 
 	Creative Commons Attribution-NonCommercial 3.0 United States License
 	Please visit above link for full license.
